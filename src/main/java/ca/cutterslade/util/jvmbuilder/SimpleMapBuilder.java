@@ -1,9 +1,6 @@
-package ca.cutterslade.util.jvmbuilder.common;
+package ca.cutterslade.util.jvmbuilder;
 
 import java.util.Map;
-
-import ca.cutterslade.util.jvmbuilder.JvmFactoryBuilder;
-import ca.cutterslade.util.jvmbuilder.MapBuilder;
 
 import com.google.common.collect.Maps;
 
@@ -61,11 +58,11 @@ public class SimpleMapBuilder<T extends JvmFactoryBuilder<T>> implements MapBuil
     return new SimpleMapBuilder<>(builder, type.inherit(), type);
   }
 
-  private final JvmFactoryBuilder<T> builder;
+  private final T builder;
   private final Map<String, String> map;
   private final Type type;
 
-  private SimpleMapBuilder(final JvmFactoryBuilder<T> builder, final Map<String, String> map, final Type type) {
+  private SimpleMapBuilder(final T builder, final Map<String, String> map, final Type type) {
     this.builder = builder;
     this.map = map;
     this.type = type;
@@ -84,7 +81,7 @@ public class SimpleMapBuilder<T extends JvmFactoryBuilder<T>> implements MapBuil
   }
 
   @Override
-  public JvmFactoryBuilder<T> build() {
+  public T build() {
     return type.setBuilder(this);
   }
 }

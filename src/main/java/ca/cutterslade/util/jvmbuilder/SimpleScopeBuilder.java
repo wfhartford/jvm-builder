@@ -1,10 +1,6 @@
-package ca.cutterslade.util.jvmbuilder.common;
+package ca.cutterslade.util.jvmbuilder;
 
 import java.util.List;
-
-import ca.cutterslade.util.jvmbuilder.JvmFactoryBuilder;
-import ca.cutterslade.util.jvmbuilder.ScopeBuilder;
-import ca.cutterslade.util.jvmbuilder.Status;
 
 import com.google.common.collect.Lists;
 

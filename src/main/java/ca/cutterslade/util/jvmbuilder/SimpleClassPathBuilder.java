@@ -1,4 +1,4 @@
-package ca.cutterslade.util.jvmbuilder.common;
+package ca.cutterslade.util.jvmbuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -6,19 +6,16 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 
-import ca.cutterslade.util.jvmbuilder.ClassPathBuilder;
-import ca.cutterslade.util.jvmbuilder.JvmFactoryBuilder;
-
 import com.google.common.collect.Lists;
 
 public class SimpleClassPathBuilder<T extends JvmFactoryBuilder<T>> implements ClassPathBuilder<T> {
 
-  private final T jvmBuilder;
+  private final T builder;
 
   private final List<String> entries;
 
   public static <T extends JvmFactoryBuilder<T>> SimpleClassPathBuilder<T> clean(final T jvmBuilder) {
-    return new SimpleClassPathBuilder<>(jvmBuilder, Lists.<String>newArrayList());
+    return new SimpleClassPathBuilder<T>(jvmBuilder, Lists.<String>newArrayList());
   }
 
   public static <T extends JvmFactoryBuilder<T>> SimpleClassPathBuilder<T> inherit(final T jvmBuilder) {
@@ -29,8 +26,8 @@ public class SimpleClassPathBuilder<T extends JvmFactoryBuilder<T>> implements C
     return Lists.newArrayList(System.getProperty("java.class.path").split(System.getProperty("path.separator")));
   }
 
-  private SimpleClassPathBuilder(final T jvmBuilder, final List<String> entries) {
-    this.jvmBuilder = jvmBuilder;
+  private SimpleClassPathBuilder(final T builder, final List<String> entries) {
+    this.builder = builder;
     this.entries = entries;
   }
 
@@ -57,6 +54,6 @@ public class SimpleClassPathBuilder<T extends JvmFactoryBuilder<T>> implements C
 
   @Override
   public JvmFactoryBuilder<T> build() {
-    return jvmBuilder.setClassPath(entries);
+    return builder.setClassPath(entries);
   }
 }

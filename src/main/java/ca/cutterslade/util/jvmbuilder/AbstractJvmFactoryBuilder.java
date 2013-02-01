@@ -1,22 +1,10 @@
-package ca.cutterslade.util.jvmbuilder.common;
+package ca.cutterslade.util.jvmbuilder;
 
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import ca.cutterslade.util.jvmbuilder.ArgumentsBuilder;
-import ca.cutterslade.util.jvmbuilder.ClassPathBuilder;
-import ca.cutterslade.util.jvmbuilder.Component;
-import ca.cutterslade.util.jvmbuilder.JvmArchitecture;
-import ca.cutterslade.util.jvmbuilder.JvmFactory;
-import ca.cutterslade.util.jvmbuilder.JvmFactoryBuilder;
-import ca.cutterslade.util.jvmbuilder.JvmType;
-import ca.cutterslade.util.jvmbuilder.MapBuilder;
-import ca.cutterslade.util.jvmbuilder.ScopeBuilder;
-import ca.cutterslade.util.jvmbuilder.SizeUnit;
-import ca.cutterslade.util.jvmbuilder.Status;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -40,12 +28,22 @@ public abstract class AbstractJvmFactoryBuilder<T extends AbstractJvmFactoryBuil
   private List<String> assertionParts;
   private Status systemAssertions;
   private Set<Component> verboseComponents;
+  private List<String> jvmArguments;
+  private List<String> programArguments;
   private StartType startType;
   private Path jarPath;
   private String mainClass;
+  private int maxHeapSize;
+  private SizeUnit maxHeapSizeUnit;
+  private int initHeapSize;
+  private SizeUnit initHeapSizeUnit;
+  private int stackSize;
+  private SizeUnit stackSizeUnit;
 
   @Override
   public T setJavaHome(final Path javaHome) {
+    Preconditions.checkArgument(null != javaHome);
+    Preconditions.checkState(null == this.javaHome);
     this.javaHome = javaHome;
     return getThis();
   }
@@ -62,6 +60,8 @@ public abstract class AbstractJvmFactoryBuilder<T extends AbstractJvmFactoryBuil
 
   @Override
   public T setJvmType(final JvmType jvmType) {
+    Preconditions.checkArgument(null != jvmType);
+    Preconditions.checkState(null == this.jvmType);
     this.jvmType = jvmType;
     return getThis();
   }
@@ -78,12 +78,16 @@ public abstract class AbstractJvmFactoryBuilder<T extends AbstractJvmFactoryBuil
 
   @Override
   public T requireArchitecture(final JvmArchitecture jvmArchitecture) {
+    Preconditions.checkArgument(null != jvmArchitecture);
+    Preconditions.checkState(null != this.jvmArchitecture);
     this.jvmArchitecture = jvmArchitecture;
     return getThis();
   }
 
   @Override
   public T requireVersion(final String jvmVersion) {
+    Preconditions.checkArgument(null != jvmVersion);
+    Preconditions.checkState(null == this.jvmVersion);
     this.jvmVersion = jvmVersion;
     return getThis();
   }
@@ -198,42 +202,51 @@ public abstract class AbstractJvmFactoryBuilder<T extends AbstractJvmFactoryBuil
 
   @Override
   public ArgumentsBuilder<T> inheritJvmArguments() {
-    throw new UnsupportedOperationException("not yet implemented");
+    return SimpleArgumentsBuilder.inheritJvmArguments(getThis());
   }
 
   @Override
   public ArgumentsBuilder<T> cleanJvmArguments() {
-    throw new UnsupportedOperationException("not yet implemented");
+    this.jvmArguments = ImmutableList.of();
+    return SimpleArgumentsBuilder.cleanJvmArguments(getThis());
   }
 
   @Override
   public T setJvmArguments(final List<String> arguments) {
-    throw new UnsupportedOperationException("not yet implemented");
+    this.jvmArguments = ImmutableList.copyOf(arguments);
+    return getThis();
   }
 
   @Override
   public ArgumentsBuilder<T> programArguments() {
-    throw new UnsupportedOperationException("not yet implemented");
+    return SimpleArgumentsBuilder.cleanProgramArguments(getThis());
   }
 
   @Override
   public T setProgramArguments(final List<String> arguments) {
-    throw new UnsupportedOperationException("not yet implemented");
+    this.programArguments = arguments;
+    return getThis();
   }
 
   @Override
   public T setMaxHeapSpace(final int size, final SizeUnit unit) {
-    throw new UnsupportedOperationException("not yet implemented");
+    maxHeapSize = size;
+    maxHeapSizeUnit = unit;
+    return getThis();
   }
 
   @Override
   public T setInitialHeapSpace(final int size, final SizeUnit unit) {
-    throw new UnsupportedOperationException("not yet implemented");
+    initHeapSize = size;
+    initHeapSizeUnit = unit;
+    return getThis();
   }
 
   @Override
   public T setStackSize(final int size, final SizeUnit unit) {
-    throw new UnsupportedOperationException("not yet implemented");
+    stackSize = size;
+    stackSizeUnit = unit;
+    return getThis();
   }
 
   @Override

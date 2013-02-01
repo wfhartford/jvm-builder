@@ -5,5 +5,5 @@ public interface MapBuilder<T extends JvmFactoryBuilder<T>> {
 
   MapBuilder<T> remove(String key);
 
-  JvmFactoryBuilder<T> build();
+  T build();
 }
