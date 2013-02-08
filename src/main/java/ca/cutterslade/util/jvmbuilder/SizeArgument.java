@@ -1,17 +1,25 @@
 package ca.cutterslade.util.jvmbuilder;
 
-public enum SizeArgument {
-  MAX_HEAP("-Xmx%d%s"),
-  INITIAL_HEAP("-Xms%d%s"),
-  STACK_SIZE("-Xss%d%s");
+import javax.annotation.concurrent.Immutable;
 
-  private final String format;
+import com.google.common.base.Preconditions;
 
-  SizeArgument(final String format) {
-    this.format = format;
+@Immutable
+public final class SizeArgument {
+  private final int size;
+  private final SizeUnit unit;
+  private final SizeParameter parameter;
+
+  public SizeArgument(final int size, final SizeUnit unit, final SizeParameter parameter) {
+    Preconditions.checkArgument(0 < size);
+    Preconditions.checkArgument(null != unit);
+    Preconditions.checkArgument(null != parameter);
+    this.size = size;
+    this.unit = unit;
+    this.parameter = parameter;
   }
 
-  String getArg(final int size, final SizeUnit unit) {
-    return String.format(format, size, unit.getSuffix());
+  public String getArgument() {
+    return parameter.getArg(size, unit);
   }
 }

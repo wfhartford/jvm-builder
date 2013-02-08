@@ -2,8 +2,11 @@ package ca.cutterslade.util.jvmbuilder;
 
 import java.util.List;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
 import com.google.common.collect.Lists;
 
+@NotThreadSafe
 public class SimpleScopeBuilder<T extends JvmFactoryBuilder<T>> implements ScopeBuilder<T> {
   public static <T extends JvmFactoryBuilder<T>> SimpleScopeBuilder<T> enable(final T builder) {
     return new SimpleScopeBuilder<>(builder, Status.ENABLED);

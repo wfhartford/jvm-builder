@@ -2,8 +2,11 @@ package ca.cutterslade.util.jvmbuilder;
 
 import java.util.Map;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
 import com.google.common.collect.Maps;
 
+@NotThreadSafe
 public class SimpleMapBuilder<T extends JvmFactoryBuilder<T>> implements MapBuilder<T> {
   public enum Type {
     PROPERTIES {

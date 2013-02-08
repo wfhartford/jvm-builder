@@ -6,8 +6,11 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
 import com.google.common.collect.Lists;
 
+@NotThreadSafe
 public class SimpleClassPathBuilder<T extends JvmFactoryBuilder<T>> implements ClassPathBuilder<T> {
 
   private final T builder;

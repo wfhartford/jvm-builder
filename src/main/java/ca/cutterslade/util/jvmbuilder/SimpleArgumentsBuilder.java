@@ -4,8 +4,11 @@ import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
 import com.google.common.collect.Lists;
 
+@NotThreadSafe
 public class SimpleArgumentsBuilder<T extends JvmFactoryBuilder<T>> implements ArgumentsBuilder<T> {
   public enum Type {
     JVM {
