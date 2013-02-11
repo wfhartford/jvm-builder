@@ -1,8 +1,11 @@
-package ca.cutterslade.util.jvmbuilder;
+package ca.cutterslade.util.jvmbuilder.common;
 
 import java.util.Map;
 
 import javax.annotation.concurrent.NotThreadSafe;
+
+import ca.cutterslade.util.jvmbuilder.JvmFactoryBuilder;
+import ca.cutterslade.util.jvmbuilder.MapBuilder;
 
 import com.google.common.collect.Maps;
 

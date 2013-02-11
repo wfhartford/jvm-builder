@@ -1,8 +1,12 @@
-package ca.cutterslade.util.jvmbuilder;
+package ca.cutterslade.util.jvmbuilder.common;
 
 import java.util.List;
 
 import javax.annotation.concurrent.NotThreadSafe;
+
+import ca.cutterslade.util.jvmbuilder.JvmFactoryBuilder;
+import ca.cutterslade.util.jvmbuilder.ScopeBuilder;
+import ca.cutterslade.util.jvmbuilder.Status;
 
 import com.google.common.collect.Lists;
 

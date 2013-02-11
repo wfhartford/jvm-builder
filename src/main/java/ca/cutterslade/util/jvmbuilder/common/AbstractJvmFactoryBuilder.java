@@ -1,4 +1,4 @@
-package ca.cutterslade.util.jvmbuilder;
+package ca.cutterslade.util.jvmbuilder.common;
 
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -7,6 +7,19 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.concurrent.NotThreadSafe;
+
+import ca.cutterslade.util.jvmbuilder.ArgumentsBuilder;
+import ca.cutterslade.util.jvmbuilder.ClassPathBuilder;
+import ca.cutterslade.util.jvmbuilder.Component;
+import ca.cutterslade.util.jvmbuilder.JvmArchitecture;
+import ca.cutterslade.util.jvmbuilder.JvmFactoryBuilder;
+import ca.cutterslade.util.jvmbuilder.JvmType;
+import ca.cutterslade.util.jvmbuilder.MapBuilder;
+import ca.cutterslade.util.jvmbuilder.ScopeBuilder;
+import ca.cutterslade.util.jvmbuilder.SizeArgument;
+import ca.cutterslade.util.jvmbuilder.SizeParameter;
+import ca.cutterslade.util.jvmbuilder.SizeUnit;
+import ca.cutterslade.util.jvmbuilder.Status;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;

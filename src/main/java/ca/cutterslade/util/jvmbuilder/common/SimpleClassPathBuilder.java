@@ -1,4 +1,4 @@
-package ca.cutterslade.util.jvmbuilder;
+package ca.cutterslade.util.jvmbuilder.common;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,6 +7,9 @@ import java.nio.file.Path;
 import java.util.List;
 
 import javax.annotation.concurrent.NotThreadSafe;
+
+import ca.cutterslade.util.jvmbuilder.ClassPathBuilder;
+import ca.cutterslade.util.jvmbuilder.JvmFactoryBuilder;
 
 import com.google.common.collect.Lists;
 

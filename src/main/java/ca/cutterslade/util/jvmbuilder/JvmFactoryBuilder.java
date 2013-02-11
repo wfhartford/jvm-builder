@@ -78,7 +78,7 @@ public interface JvmFactoryBuilder<T extends JvmFactoryBuilder<T>> {
 
   T setMainClass(String type);
 
-  JvmFactory build();
+  JvmFactory<T> build();
 
   Process start();
 
