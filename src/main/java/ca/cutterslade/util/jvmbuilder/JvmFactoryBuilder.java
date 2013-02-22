@@ -82,4 +82,5 @@ public interface JvmFactoryBuilder<T extends JvmFactoryBuilder<T>> {
 
   Process start();
 
+  T setWorkingDirectory(Path workingDirectory);
 }

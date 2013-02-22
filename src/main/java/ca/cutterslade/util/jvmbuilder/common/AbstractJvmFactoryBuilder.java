@@ -20,6 +20,7 @@ import ca.cutterslade.util.jvmbuilder.SizeArgument;
 import ca.cutterslade.util.jvmbuilder.SizeParameter;
 import ca.cutterslade.util.jvmbuilder.SizeUnit;
 import ca.cutterslade.util.jvmbuilder.Status;
+import ca.cutterslade.util.jvmbuilder.sun.SunJvmFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
@@ -32,9 +33,6 @@ import com.google.common.collect.Sets;
 @NotThreadSafe
 public abstract class AbstractJvmFactoryBuilder<T extends AbstractJvmFactoryBuilder<T>>
     implements JvmFactoryBuilder<T> {
-  protected enum StartType {
-    JAR, CLASS
-  }
 
   private Path javaHome;
   private JvmType jvmType;
@@ -58,6 +56,18 @@ public abstract class AbstractJvmFactoryBuilder<T extends AbstractJvmFactoryBuil
   private SizeUnit initHeapSizeUnit;
   private int stackSize;
   private SizeUnit stackSizeUnit;
+  private Path workingDirectory;
+
+  public T optionsFrom(final SunJvmFactory factory) {
+    return getThis();
+  }
+
+  protected void checkBuildPreconditions() {
+    Preconditions.checkState(null != startType, "Start type has not been set");
+    if (StartType.CLASS == startType) {
+      Preconditions.checkState(null != mainClass, "Start classpath has been set, but main class has not");
+    }
+  }
 
   @Override
   public T setJavaHome(final Path javaHome) {
@@ -323,6 +333,14 @@ public abstract class AbstractJvmFactoryBuilder<T extends AbstractJvmFactoryBuil
   }
 
   @Override
+  public T setWorkingDirectory(final Path workingDirectory) {
+    Preconditions.checkArgument(null != workingDirectory);
+    Preconditions.checkState(null == this.workingDirectory);
+    this.workingDirectory = workingDirectory;
+    return getThis();
+  }
+
+  @Override
   public Process start() {
     return build().start();
   }
@@ -408,6 +426,10 @@ public abstract class AbstractJvmFactoryBuilder<T extends AbstractJvmFactoryBuil
   public Iterable<SizeArgument> getSizeArguments() {
     return Iterables.filter(Arrays.asList(getMaxHeapArgument(), getInitHeapArgument(), getStackArgument()),
         Predicates.notNull());
+  }
+
+  public Path getWorkingDirectory() {
+    return workingDirectory;
   }
 
   @SuppressWarnings("unchecked")
