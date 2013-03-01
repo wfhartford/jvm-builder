@@ -30,4 +30,24 @@ public final class SizeArgument {
   public String getArgument() {
     return parameter.getArg(size, unit);
   }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    final SizeArgument that = (SizeArgument) o;
+    return size == that.size && parameter == that.parameter && unit == that.unit;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = size;
+    result = 31 * result + unit.hashCode();
+    result = 31 * result + parameter.hashCode();
+    return result;
+  }
 }

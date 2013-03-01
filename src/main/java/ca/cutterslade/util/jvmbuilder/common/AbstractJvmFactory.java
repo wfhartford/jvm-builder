@@ -345,4 +345,59 @@ public abstract class AbstractJvmFactory<T extends AbstractJvmFactoryBuilder<T>>
     return null == workingDirectory ? null : workingDirectory.toFile();
   }
 
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    final AbstractJvmFactory<?> that = (AbstractJvmFactory<?>) o;
+    return !(assertionParts != null ? !assertionParts.equals(that.assertionParts) : that.assertionParts != null) &&
+        assertions == that.assertions &&
+        !(classPath != null ? !classPath.equals(that.classPath) : that.classPath != null) &&
+        !(environment != null ? !environment.equals(that.environment) : that.environment != null) &&
+        !(initHeapSize != null ? !initHeapSize.equals(that.initHeapSize) : that.initHeapSize != null) &&
+        !(jarPath != null ? !jarPath.equals(that.jarPath) : that.jarPath != null) &&
+        !(javaHome != null ? !javaHome.equals(that.javaHome) : that.javaHome != null) &&
+        jvmArchitecture == that.jvmArchitecture &&
+        !(jvmArguments != null ? !jvmArguments.equals(that.jvmArguments) : that.jvmArguments != null) &&
+        jvmType == that.jvmType &&
+        !(jvmVersion != null ? !jvmVersion.equals(that.jvmVersion) : that.jvmVersion != null) &&
+        !(mainClass != null ? !mainClass.equals(that.mainClass) : that.mainClass != null) &&
+        !(maxHeapSize != null ? !maxHeapSize.equals(that.maxHeapSize) : that.maxHeapSize != null) &&
+        !(programArguments != null ? !programArguments.equals(that.programArguments) : that.programArguments != null) &&
+        !(properties != null ? !properties.equals(that.properties) : that.properties != null) &&
+        !(stackSize != null ? !stackSize.equals(that.stackSize) : that.stackSize != null) &&
+        startType == that.startType && systemAssertions == that.systemAssertions &&
+        !(verboseComponents != null ? !verboseComponents.equals(that.verboseComponents) :
+            that.verboseComponents != null) &&
+        !(workingDirectory != null ? !workingDirectory.equals(that.workingDirectory) : that.workingDirectory != null);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = javaHome != null ? javaHome.hashCode() : 0;
+    result = 31 * result + (jvmType != null ? jvmType.hashCode() : 0);
+    result = 31 * result + (jvmArchitecture != null ? jvmArchitecture.hashCode() : 0);
+    result = 31 * result + (jvmVersion != null ? jvmVersion.hashCode() : 0);
+    result = 31 * result + (classPath != null ? classPath.hashCode() : 0);
+    result = 31 * result + (properties != null ? properties.hashCode() : 0);
+    result = 31 * result + (environment != null ? environment.hashCode() : 0);
+    result = 31 * result + (assertions != null ? assertions.hashCode() : 0);
+    result = 31 * result + (assertionParts != null ? assertionParts.hashCode() : 0);
+    result = 31 * result + (systemAssertions != null ? systemAssertions.hashCode() : 0);
+    result = 31 * result + (verboseComponents != null ? verboseComponents.hashCode() : 0);
+    result = 31 * result + (jvmArguments != null ? jvmArguments.hashCode() : 0);
+    result = 31 * result + (programArguments != null ? programArguments.hashCode() : 0);
+    result = 31 * result + (startType != null ? startType.hashCode() : 0);
+    result = 31 * result + (jarPath != null ? jarPath.hashCode() : 0);
+    result = 31 * result + (mainClass != null ? mainClass.hashCode() : 0);
+    result = 31 * result + (maxHeapSize != null ? maxHeapSize.hashCode() : 0);
+    result = 31 * result + (initHeapSize != null ? initHeapSize.hashCode() : 0);
+    result = 31 * result + (stackSize != null ? stackSize.hashCode() : 0);
+    result = 31 * result + (workingDirectory != null ? workingDirectory.hashCode() : 0);
+    return result;
+  }
 }
