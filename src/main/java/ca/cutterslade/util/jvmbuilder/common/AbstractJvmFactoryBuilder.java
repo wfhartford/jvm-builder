@@ -1,5 +1,7 @@
 package ca.cutterslade.util.jvmbuilder.common;
 
+import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +14,7 @@ import ca.cutterslade.util.jvmbuilder.ArgumentsBuilder;
 import ca.cutterslade.util.jvmbuilder.ClassPathBuilder;
 import ca.cutterslade.util.jvmbuilder.Component;
 import ca.cutterslade.util.jvmbuilder.JvmArchitecture;
+import ca.cutterslade.util.jvmbuilder.JvmFactory;
 import ca.cutterslade.util.jvmbuilder.JvmFactoryBuilder;
 import ca.cutterslade.util.jvmbuilder.JvmType;
 import ca.cutterslade.util.jvmbuilder.MapBuilder;
@@ -20,7 +23,6 @@ import ca.cutterslade.util.jvmbuilder.SizeArgument;
 import ca.cutterslade.util.jvmbuilder.SizeParameter;
 import ca.cutterslade.util.jvmbuilder.SizeUnit;
 import ca.cutterslade.util.jvmbuilder.Status;
-import ca.cutterslade.util.jvmbuilder.sun.SunJvmFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
@@ -58,7 +60,31 @@ public abstract class AbstractJvmFactoryBuilder<T extends AbstractJvmFactoryBuil
   private SizeUnit stackSizeUnit;
   private Path workingDirectory;
 
-  public T optionsFrom(final SunJvmFactory factory) {
+  public T from(final JvmFactory<?> factory) {
+    final AbstractJvmFactory<?> ajf = (AbstractJvmFactory<?>) factory;
+    this.javaHome = ajf.getBuilderJavaHome();
+    this.jvmType = ajf.getBuilderJvmType();
+    this.jvmArchitecture = ajf.getBuilderJvmArchitecture();
+    this.jvmVersion = ajf.getBuilderJvmVersion();
+    this.classPath = ajf.getBuilderClassPath();
+    this.properties = ajf.getBuilderProperties();
+    this.environment = ajf.getBuilderEnvironment();
+    this.assertions = ajf.getBuilderAssertions();
+    this.assertionParts = ajf.getBuilderAssertionParts();
+    this.systemAssertions = ajf.getBuilderSystemAssertions();
+    this.verboseComponents = ajf.getBuilderVerboseComponents();
+    this.jvmArguments = ajf.getBuilderJvmArguments();
+    this.programArguments = ajf.getBuilderProgramArguments();
+    this.startType = ajf.getBuilderStartType();
+    this.jarPath = ajf.getBuilderJarPath();
+    this.mainClass = ajf.getBuilderMainClass();
+    this.maxHeapSize = ajf.getBuilderMaxHeapSize().getSize();
+    this.maxHeapSizeUnit = ajf.getBuilderMaxHeapSize().getUnit();
+    this.initHeapSize = ajf.getBuilderInitHeapSize().getSize();
+    this.initHeapSizeUnit = ajf.getBuilderInitHeapSize().getUnit();
+    this.stackSize = ajf.getBuilderStackSize().getSize();
+    this.stackSizeUnit = ajf.getBuilderStackSize().getUnit();
+    this.workingDirectory = ajf.getBuilderWorkingDirectory();
     return getThis();
   }
 
@@ -320,6 +346,11 @@ public abstract class AbstractJvmFactoryBuilder<T extends AbstractJvmFactoryBuil
   @Override
   public T setMainClass(final Class<?> type) {
     Preconditions.checkArgument(null != type);
+    Preconditions.checkArgument(!type.isInterface());
+    Preconditions.checkArgument(Modifier.isPublic(type.getModifiers()));
+    Preconditions.checkArgument(!type.isAnonymousClass());
+    Preconditions.checkArgument(null == type.getEnclosingClass() || Modifier.isStatic(type.getModifiers()));
+    Preconditions.checkArgument(null == type.getEnclosingConstructor() && null == type.getEnclosingMethod());
     return setMainClass(type.getName());
   }
 
@@ -340,8 +371,17 @@ public abstract class AbstractJvmFactoryBuilder<T extends AbstractJvmFactoryBuil
     return getThis();
   }
 
+  public T resetProgram() {
+    this.startType = null;
+    this.classPath = null;
+    this.mainClass = null;
+    this.jarPath = null;
+    this.programArguments = null;
+    return getThis();
+  }
+
   @Override
-  public Process start() {
+  public Process start() throws IOException {
     return build().start();
   }
 

@@ -1,5 +1,6 @@
 package ca.cutterslade.util.jvmbuilder;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +81,7 @@ public interface JvmFactoryBuilder<T extends JvmFactoryBuilder<T>> {
 
   JvmFactory<T> build();
 
-  Process start();
+  Process start() throws IOException;
 
   T setWorkingDirectory(Path workingDirectory);
 }

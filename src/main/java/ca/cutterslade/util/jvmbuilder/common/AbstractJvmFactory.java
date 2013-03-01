@@ -51,33 +51,112 @@ public abstract class AbstractJvmFactory<T extends AbstractJvmFactoryBuilder<T>>
     jvmArchitecture = builder.getJvmArchitecture();
     jvmVersion = builder.getJvmVersion();
     classPath = null == builder.getClassPath() ? null : ImmutableList.copyOf(builder.getClassPath());
-    properties = null == builder.getProperties() ?
-        ImmutableMap.<String, String>of() : ImmutableMap.copyOf(builder.getProperties());
-    environment = null == builder.getEnvironment() ?
-        ImmutableMap.<String, String>of() : ImmutableMap.copyOf(builder.getEnvironment());
+    properties = null == builder.getProperties() ? null : ImmutableMap.copyOf(builder.getProperties());
+    environment = null == builder.getEnvironment() ? null : ImmutableMap.copyOf(builder.getEnvironment());
     assertions = builder.getAssertions();
     assertionParts = null == builder.getAssertionParts() ? null : ImmutableList.copyOf(builder.getAssertionParts());
     systemAssertions = builder.getSystemAssertions();
     verboseComponents =
         null == builder.getVerboseComponents() ? null : ImmutableSet.copyOf(builder.getVerboseComponents());
     jvmArguments = null == builder.getJvmArguments() ? null : ImmutableList.copyOf(builder.getJvmArguments());
-    programArguments = null == builder.getProgramArguments() ?
-        ImmutableList.<String>of() : ImmutableList.copyOf(builder.getProgramArguments());
+    programArguments =
+        null == builder.getProgramArguments() ? null : ImmutableList.copyOf(builder.getProgramArguments());
     startType = builder.getStartType();
-    jarPath = builder.getJarPath();
-    mainClass = builder.getMainClass();
+    jarPath = startType == StartType.JAR ? builder.getJarPath() : null;
+    mainClass = startType == StartType.CLASS ? builder.getMainClass() : null;
     maxHeapSize = builder.getMaxHeapArgument();
     initHeapSize = builder.getInitHeapArgument();
     stackSize = builder.getStackArgument();
     workingDirectory = builder.getWorkingDirectory();
   }
 
-  protected ImmutableList<String> getCommand() {
+  Path getBuilderJavaHome() {
+    return javaHome;
+  }
+
+  JvmType getBuilderJvmType() {
+    return jvmType;
+  }
+
+  JvmArchitecture getBuilderJvmArchitecture() {
+    return jvmArchitecture;
+  }
+
+  String getBuilderJvmVersion() {
+    return jvmVersion;
+  }
+
+  ImmutableMap<String, String> getBuilderProperties() {
+    return properties;
+  }
+
+  ImmutableList<String> getBuilderClassPath() {
+    return classPath;
+  }
+
+  ImmutableMap<String, String> getBuilderEnvironment() {
+    return environment;
+  }
+
+  Status getBuilderAssertions() {
+    return assertions;
+  }
+
+  ImmutableList<String> getBuilderAssertionParts() {
+    return assertionParts;
+  }
+
+  Status getBuilderSystemAssertions() {
+    return systemAssertions;
+  }
+
+  ImmutableSet<Component> getBuilderVerboseComponents() {
+    return verboseComponents;
+  }
+
+  ImmutableList<String> getBuilderJvmArguments() {
+    return jvmArguments;
+  }
+
+  ImmutableList<String> getBuilderProgramArguments() {
+    return programArguments;
+  }
+
+  StartType getBuilderStartType() {
+    return startType;
+  }
+
+  Path getBuilderJarPath() {
+    return jarPath;
+  }
+
+  String getBuilderMainClass() {
+    return mainClass;
+  }
+
+  SizeArgument getBuilderMaxHeapSize() {
+    return maxHeapSize;
+  }
+
+  SizeArgument getBuilderInitHeapSize() {
+    return initHeapSize;
+  }
+
+  SizeArgument getBuilderStackSize() {
+    return stackSize;
+  }
+
+  Path getBuilderWorkingDirectory() {
+    return workingDirectory;
+  }
+
+  protected ImmutableList<String> getCommand(final String[] args) {
     return ImmutableList.<String>builder()
         .add(getExecutable())
         .addAll(getJvmOptions())
         .addAll(getProgram())
         .addAll(getProgramArguments())
+        .add(args)
         .build();
   }
 
@@ -90,12 +169,16 @@ public abstract class AbstractJvmFactory<T extends AbstractJvmFactoryBuilder<T>>
   }
 
   protected Iterable<String> getJvmOptions() {
-    ImmutableList.Builder<String> builder = ImmutableList.builder();
+    final ImmutableList.Builder<String> builder = ImmutableList.builder();
     addJvmTypeArgument(builder);
     addJvmArchitectureArgument(builder);
     addJvmVersionArgument(builder);
     addAssertionArguments(builder);
     addSystemAssertionArgument(builder);
+    addVerboseComponentsArgument(builder);
+    addJvmArguments(builder);
+    addSizeArguments(builder);
+    addPropertiesArguments(builder);
     return builder.build();
   }
 
@@ -152,6 +235,55 @@ public abstract class AbstractJvmFactory<T extends AbstractJvmFactoryBuilder<T>>
     }
   }
 
+  protected void addVerboseComponentsArgument(final ImmutableList.Builder<String> builder) {
+    if (null != verboseComponents) {
+      if (verboseComponents.isEmpty()) {
+        builder.add("-verbose");
+      }
+      else {
+        for (final Component component : verboseComponents) {
+          builder.add(component.getArgument());
+        }
+      }
+    }
+  }
+
+  protected void addJvmArguments(final ImmutableList.Builder<String> builder) {
+    if (null == jvmArguments) {
+      builder.addAll(getCurrentJvmArguments());
+    }
+    else {
+      builder.addAll(jvmArguments);
+    }
+  }
+
+  protected abstract Iterable<String> getCurrentJvmArguments();
+
+  protected void addSizeArguments(final ImmutableList.Builder<String> builder) {
+    if (null != maxHeapSize) {
+      builder.add(maxHeapSize.getArgument());
+    }
+    if (null != initHeapSize) {
+      builder.add(initHeapSize.getArgument());
+    }
+    if (null != stackSize) {
+      builder.add(stackSize.getArgument());
+    }
+  }
+
+  protected void addPropertiesArguments(final ImmutableList.Builder<String> builder) {
+    if (null == properties) {
+      builder.addAll(getCurrentPropertiesArguments());
+    }
+    else {
+      for (final Map.Entry<String, String> entry : properties.entrySet()) {
+        builder.add("-D" + entry.getKey() + '=' + entry.getValue());
+      }
+    }
+  }
+
+  protected abstract Iterable<String> getCurrentPropertiesArguments();
+
   protected Iterable<String> getProgram() {
     return StartType.JAR == startType ? ImmutableList.of("-jar", getJarPath()) :
         ImmutableList.of("-cp", getClassPath(), getMainClass());
@@ -162,7 +294,8 @@ public abstract class AbstractJvmFactory<T extends AbstractJvmFactoryBuilder<T>>
   }
 
   private String getClassPath() {
-    return Joiner.on(System.getProperty("path.separator")).join(classPath);
+    return null == classPath ? System.getProperty("java.class.path") :
+        Joiner.on(System.getProperty("path.separator")).join(classPath);
   }
 
   private String getMainClass() {
@@ -170,7 +303,7 @@ public abstract class AbstractJvmFactory<T extends AbstractJvmFactoryBuilder<T>>
   }
 
   protected Iterable<String> getProgramArguments() {
-    return programArguments;
+    return null == programArguments ? ImmutableList.<String>of() : programArguments;
   }
 
   protected ImmutableMap<String, String> getEnvironment() {
@@ -183,7 +316,7 @@ public abstract class AbstractJvmFactory<T extends AbstractJvmFactoryBuilder<T>>
 
   @Override
   public Process start(final String... args) throws IOException {
-    return Runtime.getRuntime().exec(getCommandArray(), getEnvironmentArray(), getWorkingDirectoryFile());
+    return Runtime.getRuntime().exec(getCommandArray(args), getEnvironmentArray(), getWorkingDirectoryFile());
   }
 
   private String[] getEnvironmentArray() {
@@ -195,20 +328,21 @@ public abstract class AbstractJvmFactory<T extends AbstractJvmFactoryBuilder<T>>
     else {
       environmentArray = new String[environment.size()];
       int position = 0;
-      for (Map.Entry<String, String> entry : environment.entrySet()) {
+      for (final Map.Entry<String, String> entry : environment.entrySet()) {
         environmentArray[position++] = entry.getKey() + '=' + entry.getValue();
       }
     }
     return environmentArray;
   }
 
-  private String[] getCommandArray() {
-    final ImmutableList<String> command = getCommand();
+  private String[] getCommandArray(final String[] args) {
+    final ImmutableList<String> command = getCommand(args);
     return command.toArray(new String[command.size()]);
   }
 
   private File getWorkingDirectoryFile() {
-    Path workingDirectory = getWorkingDirectory();
+    final Path workingDirectory = getWorkingDirectory();
     return null == workingDirectory ? null : workingDirectory.toFile();
   }
+
 }

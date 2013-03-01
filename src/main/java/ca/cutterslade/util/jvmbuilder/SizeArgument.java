@@ -19,6 +19,14 @@ public final class SizeArgument {
     this.parameter = parameter;
   }
 
+  public int getSize() {
+    return size;
+  }
+
+  public SizeUnit getUnit() {
+    return unit;
+  }
+
   public String getArgument() {
     return parameter.getArg(size, unit);
   }

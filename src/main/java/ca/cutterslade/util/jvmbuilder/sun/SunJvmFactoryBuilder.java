@@ -1,5 +1,6 @@
 package ca.cutterslade.util.jvmbuilder.sun;
 
+import ca.cutterslade.util.jvmbuilder.JvmFactory;
 import ca.cutterslade.util.jvmbuilder.common.AbstractJvmFactoryBuilder;
 
 public final class SunJvmFactoryBuilder extends AbstractJvmFactoryBuilder<SunJvmFactoryBuilder> {
@@ -15,7 +16,7 @@ public final class SunJvmFactoryBuilder extends AbstractJvmFactoryBuilder<SunJvm
   }
 
   @Override
-  public SunJvmFactoryBuilder optionsFrom(final SunJvmFactory factory) {
-    return super.optionsFrom(factory);
+  public SunJvmFactoryBuilder from(final JvmFactory<?> factory) {
+    return super.from(factory);
   }
 }
