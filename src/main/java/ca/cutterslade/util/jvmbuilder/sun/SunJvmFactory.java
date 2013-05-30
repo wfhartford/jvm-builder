@@ -16,12 +16,13 @@ public class SunJvmFactory extends AbstractJvmFactory<SunJvmFactoryBuilder> {
 
   private static final Pattern HANDLED_ARGUMENTS_PATTERN = Pattern.compile(
       "(?:-X(?:mx|ms|ss)\\d+[kmg]?)|-client|-server|" +
-          "(?:-ea|-enableassertions|-da|-disablesystemassertions(?::.+)?)|" +
-          "-esa|-enablesystemassertions|-dsa|-disablesystemassertions|-verbose(?::.+)?|-version:.+|-d32|-d64|-D.+");
-  private static final Predicate<String> HANDLED_ARGUMENTS_PREDICATE = new Predicate<String>() {
+          "(?:(?:-ea|-enableassertions|-da|-disableassertions)(?::.+)?)|" +
+          "-esa|-enablesystemassertions|-dsa|-disablesystemassertions|" +
+          "(?:-verbose(?::.+)?)|(?:-version:.+)|-d32|-d64|(?:-D.+)");
+  private static final Predicate<String> NOT_HANDLED_ARGUMENTS_PREDICATE = new Predicate<String>() {
     @Override
     public boolean apply(@Nullable final String input) {
-      return HANDLED_ARGUMENTS_PATTERN.matcher(input).matches();
+      return !HANDLED_ARGUMENTS_PATTERN.matcher(input).matches();
     }
   };
 
@@ -60,7 +61,8 @@ public class SunJvmFactory extends AbstractJvmFactory<SunJvmFactoryBuilder> {
 
   @Override
   protected Iterable<String> getCurrentJvmArguments() {
-    return Collections2.filter(ManagementFactory.getRuntimeMXBean().getInputArguments(), HANDLED_ARGUMENTS_PREDICATE);
+    return Collections2.filter(ManagementFactory.getRuntimeMXBean().getInputArguments(),
+        NOT_HANDLED_ARGUMENTS_PREDICATE);
   }
 
   @Override

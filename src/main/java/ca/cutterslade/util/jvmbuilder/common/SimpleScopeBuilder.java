@@ -53,6 +53,6 @@ public class SimpleScopeBuilder<T extends JvmFactoryBuilder<T>> implements Scope
 
   @Override
   public T build() {
-    return builder.setAssertions(status, parts);
+    return parts.isEmpty() ? builder : builder.setAssertions(status, parts);
   }
 }

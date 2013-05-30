@@ -10,6 +10,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ca.cutterslade.util.jvmbuilder.Component;
 import ca.cutterslade.util.jvmbuilder.JvmArchitecture;
 import ca.cutterslade.util.jvmbuilder.JvmFactory;
@@ -24,6 +27,7 @@ import com.google.common.collect.ImmutableSet;
 
 @Immutable
 public abstract class AbstractJvmFactory<T extends AbstractJvmFactoryBuilder<T>> implements JvmFactory<T> {
+  private static final Logger log = LoggerFactory.getLogger(AbstractJvmFactory.class);
   private final Path javaHome;
   private final JvmType jvmType;
   private final JvmArchitecture jvmArchitecture;
@@ -220,7 +224,7 @@ public abstract class AbstractJvmFactory<T extends AbstractJvmFactoryBuilder<T>>
 
   protected void addAssertionArguments(final ImmutableList.Builder<String> builder) {
     if (null != assertions) {
-      if (null == assertionParts) {
+      if (null == assertionParts || assertionParts.isEmpty()) {
         builder.add(assertions.getProgramArgument());
       }
       else {
@@ -316,7 +320,12 @@ public abstract class AbstractJvmFactory<T extends AbstractJvmFactoryBuilder<T>>
 
   @Override
   public Process start(final String... args) throws IOException {
-    return Runtime.getRuntime().exec(getCommandArray(args), getEnvironmentArray(), getWorkingDirectoryFile());
+    final String[] commandArray = getCommandArray(args);
+    final String[] environmentArray = getEnvironmentArray();
+    final File workingDirectoryFile = getWorkingDirectoryFile();
+    log.debug("Starting JVM with command {}, environment {}, in workding directory {}",
+        commandArray, environmentArray, workingDirectoryFile);
+    return Runtime.getRuntime().exec(commandArray, environmentArray, workingDirectoryFile);
   }
 
   private String[] getEnvironmentArray() {
