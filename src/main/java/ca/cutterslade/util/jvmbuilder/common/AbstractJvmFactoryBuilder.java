@@ -78,12 +78,15 @@ public abstract class AbstractJvmFactoryBuilder<T extends AbstractJvmFactoryBuil
     this.startType = ajf.getBuilderStartType();
     this.jarPath = ajf.getBuilderJarPath();
     this.mainClass = ajf.getBuilderMainClass();
-    this.maxHeapSize = ajf.getBuilderMaxHeapSize().getSize();
-    this.maxHeapSizeUnit = ajf.getBuilderMaxHeapSize().getUnit();
-    this.initHeapSize = ajf.getBuilderInitHeapSize().getSize();
-    this.initHeapSizeUnit = ajf.getBuilderInitHeapSize().getUnit();
-    this.stackSize = ajf.getBuilderStackSize().getSize();
-    this.stackSizeUnit = ajf.getBuilderStackSize().getUnit();
+    final SizeArgument builderMaxHeapSize = ajf.getBuilderMaxHeapSize();
+    this.maxHeapSize = null == builderMaxHeapSize ? 0 : builderMaxHeapSize.getSize();
+    this.maxHeapSizeUnit = null == builderMaxHeapSize ? null : builderMaxHeapSize.getUnit();
+    final SizeArgument builderInitHeapSize = ajf.getBuilderInitHeapSize();
+    this.initHeapSize = null == builderInitHeapSize ? 0 : builderInitHeapSize.getSize();
+    this.initHeapSizeUnit = null == builderInitHeapSize ? null : builderInitHeapSize.getUnit();
+    final SizeArgument builderStackSize = ajf.getBuilderStackSize();
+    this.stackSize = null == builderStackSize ? 0 : builderStackSize.getSize();
+    this.stackSizeUnit = null == builderStackSize ? null : builderStackSize.getUnit();
     this.workingDirectory = ajf.getBuilderWorkingDirectory();
     return getThis();
   }
