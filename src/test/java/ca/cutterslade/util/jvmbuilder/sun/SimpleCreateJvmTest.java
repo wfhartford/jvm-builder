@@ -6,7 +6,6 @@ import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -16,6 +15,13 @@ import ca.cutterslade.util.jvmbuilder.SizeUnit;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
+
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class SimpleCreateJvmTest {
 
@@ -72,48 +78,52 @@ public class SimpleCreateJvmTest {
 
   @Test(timeout = 10_000)
   public void testStart() throws IOException, InterruptedException {
-    Assert.assertEquals(TEST_STRING + System.lineSeparator(), getStdOut(getBuilder(TestMain.class)));
+    assertEquals(TEST_STRING, getStdOut(getBuilder(TestMain.class)));
   }
 
   @Test(timeout = 10_000)
   public void testAdjustMaxHeap() throws InterruptedException, IOException {
-    final String stdOut = getStdOut(getBuilder(MaxHeapMain.class)
-        .setMaxHeapSpace(256, SizeUnit.MEGABYTES));
-    Assert.assertEquals("238616576" + System.lineSeparator(), stdOut);
+    final String stdOut = getStdOut(getBuilder(MaxHeapMain.class).setMaxHeapSpace(256, SizeUnit.MEGABYTES));
+    // Different platforms will result in a slightly different exact heap size
+    assertThat(stdOut, anyOf(
+        // My 32-bit Windows XP home desktop
+        equalTo("259522560"),
+        // My 64-bit Ubuntu 12.04 laptop
+        equalTo("238616576")));
   }
 
   @Test(timeout = 10_000)
   public void testArgument() throws IOException, InterruptedException {
     final String stdOut = getStdOut(getBuilder(PrintArgumentMain.class)
         .setProgramArguments(Arrays.asList("hello", "world")));
-    Assert.assertEquals("hello world" + System.lineSeparator(), stdOut);
+    assertEquals("hello world", stdOut);
   }
 
   @Test(timeout = 10_000)
   public void testProperty() throws IOException, InterruptedException {
     final String stdOut = getStdOut(getBuilder(PrintPropertyMain.class)
         .setProperties(ImmutableMap.of(TEST_STRING_KEY, TEST_STRING)));
-    Assert.assertEquals(TEST_STRING + System.lineSeparator(), stdOut);
+    assertEquals(TEST_STRING, stdOut);
   }
 
   @Test(timeout = 10_000)
   public void testEnvironment() throws IOException, InterruptedException {
     final String stdOut = getStdOut(getBuilder(PrintEnvironmentMain.class)
         .setEnvironment(ImmutableMap.of(TEST_STRING_KEY, TEST_STRING)));
-    Assert.assertEquals(TEST_STRING + System.lineSeparator(), stdOut);
+    assertEquals(TEST_STRING, stdOut);
   }
 
   @Test(timeout = 10_000)
   public void testAssertionsDisabled() throws IOException, InterruptedException {
     final String stdOut = getStdOut(getBuilder(AssertFalseMain.class).disableAssertions().build());
-    Assert.assertEquals("", stdOut);
+    assertEquals("", stdOut);
   }
 
   @Test(timeout = 10_000)
   public void testAssertionsEnabled() throws IOException, InterruptedException {
     final String stdOut = getStdOut(getBuilder(AssertFalseMain.class).enableAssertions().build(), 1,
         Pattern.compile("(?s)Exception in thread \"main\" java\\.lang\\.AssertionError.*"));
-    Assert.assertEquals("", stdOut);
+    assertEquals("", stdOut);
   }
 
   @Test(timeout = 10_000)
@@ -121,7 +131,7 @@ public class SimpleCreateJvmTest {
     final File tempDir = Files.createTempDir();
     try {
       final String stdOut = getStdOut(getBuilder(WorkingDirectoryMain.class).setWorkingDirectory(tempDir.toPath()));
-      Assert.assertEquals(tempDir.getCanonicalPath() + System.lineSeparator(), stdOut);
+      assertEquals(tempDir.getCanonicalPath(), stdOut);
     }
     finally {
       tempDir.delete();
@@ -131,14 +141,14 @@ public class SimpleCreateJvmTest {
   @Test(timeout = 10_000)
   public void testServerVm() throws IOException, InterruptedException {
     final String stdOut = getStdOut(getBuilder(JvmTypeMain.class).server());
-    Assert.assertTrue("Expected 'server' in stdOut: " + stdOut, stdOut.toLowerCase().contains("server"));
+    assertTrue("Expected 'server' in stdOut: " + stdOut, stdOut.toLowerCase().contains("server"));
   }
 
   @Test(timeout = 10_000)
   @Ignore // Many VMs don't ship with a client implementation depending on target OS and architecture
   public void testClientVm() throws IOException, InterruptedException {
     final String stdOut = getStdOut(getBuilder(JvmTypeMain.class).client());
-    Assert.assertTrue("Expected 'client' in stdOut: " + stdOut, stdOut.toLowerCase().contains("client"));
+    assertTrue("Expected 'client' in stdOut: " + stdOut, stdOut.toLowerCase().contains("client"));
   }
 
   @Test(timeout = 10_000)
@@ -147,7 +157,7 @@ public class SimpleCreateJvmTest {
     final SunJvmFactoryBuilder builder = getBuilder(TestMain.class).require32Bit();
     final String stdOut = current32Bit ? getStdOut(builder) : getStdOut(builder, 1,
         Pattern.compile("(?s)Error: This Java instance does not support a 32-bit JVM\\..*"));
-    Assert.assertEquals(current32Bit ? TEST_STRING + System.lineSeparator() : "", stdOut);
+    assertEquals(current32Bit ? TEST_STRING : "", stdOut);
   }
 
   @Test(timeout = 10_000)
@@ -156,7 +166,7 @@ public class SimpleCreateJvmTest {
     final SunJvmFactoryBuilder builder = getBuilder(TestMain.class).require64Bit();
     final String stdOut = current64Bit ? getStdOut(builder) : getStdOut(builder, 1,
         Pattern.compile("(?s)Error: This Java instance does not support a 64-bit JVM\\..*"));
-    Assert.assertEquals(current64Bit ? TEST_STRING + System.lineSeparator() : "", stdOut);
+    assertEquals(current64Bit ? TEST_STRING : "", stdOut);
   }
 
   private static SunJvmFactoryBuilder getBuilder(final Class<?> mainClass) {
@@ -177,16 +187,16 @@ public class SimpleCreateJvmTest {
     process.waitFor();
     stdOut.join();
     stdErr.join();
-    Assert.assertEquals(exitValue, process.exitValue());
+    assertEquals(exitValue, process.exitValue());
     if (null == stdErrPattern) {
-      Assert.assertEquals("", stdErr.getResult());
+      assertEquals("", stdErr.getResult());
     }
     else {
-      Assert.assertTrue("stdErr does not match expected pattern: " + stdErr.getResult(),
+      assertTrue("stdErr does not match expected pattern: " + stdErr.getResult(),
           stdErrPattern.matcher(stdErr.getResult()).matches());
     }
-    Assert.assertNull(stdErr.getThrowable());
-    Assert.assertNull(stdOut.getThrowable());
-    return stdOut.getResult();
+    assertNull(stdErr.getThrowable());
+    assertNull(stdOut.getThrowable());
+    return stdOut.getResult().trim();
   }
 }
